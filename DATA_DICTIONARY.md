@@ -1,6 +1,8 @@
 # Data dictionary
 
-Version 1 · November 2, 2026 · PostgreSQL/Supabase · Campus display timezone America/New_York.
+Version 2 · November 2, 2026 · PostgreSQL/Supabase · Campus display timezone America/New_York.
+**Current scope: Niner Engage only (638 records).** Campus-calendar field mappings below document retained historical rows and the legacy parser; they are not part of current collection, serving or D2 analysis. Public catalog API responses are allowlisted to Niner Engage, while historical Supabase rows remain preserved.
+
 All timestamptz values represent instants; ingestion emits UTC ISO 8601. SQL NULL means missing, empty arrays mean no observed entries, and empty description means no usable text. No missing factual attribute becomes “no.” Strings are normalized Unicode text, HTML removed. All identifiers/hashes described as SHA-256 are 64 lowercase hex characters. Foreign keys enforce lineage. Schema is in `schema.sql`.
 
 ## event_sources (public read-only)
@@ -101,4 +103,4 @@ All timestamptz values represent instants; ingestion emits UTC ISO 8601. SQL NUL
 | frozen_at | timestamptz | Timestamp of first immutable split manifest |
 
 ## Cleaning and coverage decisions
-No records in the initial snapshot failed required date/ID/title validation. 638 Engage and 849 Localist records remain separate source occurrences. Three excess exact cross-source keys are flagged by analysis and collapsed during recommendations; no fuzzy merge is asserted. Seventeen cancellations are explicit. Missing structured venue/end values are retained even if prose or title offers clues. Localist dates can describe a registration window rather than the later activity date; users should inspect the official page. Midnight is not assumed all-day. Historical and far-future records remain available for analysis; upcoming API results use an explicit time/status filter. Full original feeds live under ignored `data/raw/`; item versions live privately in Supabase. RSS pubDate is preserved in raw XML only.
+The active Niner Engage snapshot contains 638 records, all passing required date/ID/title validation. There are 16 explicit cancellations and zero duplicate-key excess records. Descriptions, structured start/end dates, locations and categories are present for every record; 12 records lack an organizer. All 638 lack an explicit shared series identifier; related-title grouping is a conservative evaluation safeguard, not an assertion of recurrence. Historical starts remain available for analysis; upcoming API results filter by time/status. Full original feeds remain under ignored `data/raw/`, with raw item versions stored privately in Supabase. RSS pubDate is retained in raw XML only. The 849 older campus-calendar records are retained for provenance but excluded from current reports and app/API results.

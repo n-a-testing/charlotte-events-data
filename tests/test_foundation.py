@@ -69,3 +69,28 @@ def test_split_disjoint():
 def test_model_cannot_crop_negation():
     with pytest.raises(ValueError):
         validate({'free_food':'yes','evidence':{'free_food':'free pizza'}},'There is no free pizza.')
+
+
+def test_active_catalog_excludes_legacy_source(monkeypatch,event):
+    import storage
+    from pipeline import SOURCES
+    assert set(SOURCES)=={'ninerengage'}
+    calls=[]
+    class FakeDB:
+        def rows(self,table,**filters):
+            calls.append((table,filters))
+            if table=='events': return [event]
+            if table=='event_sources': return [{'id':'ninerengage'}]
+            return []
+    monkeypatch.setattr(storage,'Supabase',FakeDB)
+    events,sources=storage.load_catalog()
+    assert ('events',{'source_id':'in.(ninerengage)'}) in calls
+    assert ('event_sources',{'id':'in.(ninerengage)'}) in calls
+    assert all(e['source_id']=='ninerengage' for e in events)
+
+
+def test_active_split_preserves_assignments():
+    original={r['event_id']:r for r in json.loads((BASE/'data/split_manifest.json').read_text())}
+    active=json.loads((BASE/'data/active_split_manifest.json').read_text())
+    assert len(active)==638
+    assert all(r==original[r['event_id']] for r in active)

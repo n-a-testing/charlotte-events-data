@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from pipeline import BASE, now
+from pipeline import BASE, now, SOURCES
 from tagging import baseline
 
 def frame(events):
@@ -36,7 +36,9 @@ def plots(df):
 
 def freeze(events):
     target=BASE/'data/split_manifest.json'
-    if target.exists(): return json.loads(target.read_text())
+    if target.exists():
+        ids={e['id'] for e in events}
+        return [r for r in json.loads(target.read_text()) if r['event_id'] in ids]
     parent={e['id']:e['id'] for e in events}
     def root(x):
         while parent[x]!=x: parent[x]=parent[parent[x]]; x=parent[x]
@@ -58,7 +60,8 @@ def freeze(events):
     target.write_text(json.dumps(rows,indent=2)); return rows
 
 def main():
-    events=json.loads((BASE/'data/events.json').read_text()); df=frame(events); freeze(events)
+    events=[e for e in json.loads((BASE/'data/events.json').read_text()) if e['source_id'] in SOURCES]; df=frame(events)
+    (BASE/'data/active_split_manifest.json').write_text(json.dumps(freeze(events),indent=2))
     (BASE/'reports').mkdir(exist_ok=True)
     for i,fig in enumerate(plots(df),1): fig.savefig(BASE/f'reports/figure-{i}.png',dpi=160); plt.close(fig)
     stats={'records':len(df),'sources':df.source_id.value_counts().to_dict(),'status':df.status.value_counts().to_dict(), 'start_min':str(df.campus_start.min()),'start_max':str(df.campus_start.max()),'missing':{k:int(df[k].apply(lambda v:v is None or v=='' or v==[]).sum()) for k in ['description','end_at','location','organizers','source_categories','series_id']},'facts':{k:df[k].value_counts().to_dict() for k in ['free_food','free_admission','registration_required']},'top_categories':df.explode('source_categories').source_categories.value_counts().head(5).to_dict(),'top_organizers':df.explode('organizers').organizers.value_counts().head(5).to_dict(),'duplicate_key_excess':int(df.duplicate_key.duplicated().sum()),'weekday':df.campus_start.dt.day_name().value_counts().to_dict(),'splits':dict(Counter(r['split'] for r in freeze(events)))}

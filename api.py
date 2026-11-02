@@ -5,7 +5,7 @@ from recommend import recommend
 from datetime import datetime, timezone
 from functools import lru_cache
 import time
-app=FastAPI(title='Charlotte Events Data API',version='1.0.0',description='Public university feed data. Campus timezone: America/New_York. Tags are provisional unless reviewed. No personal data is persisted.')
+app=FastAPI(title='Charlotte Events Data API',version='1.0.0',description='Niner Engage public event data. Campus-calendar records are excluded. Campus timezone: America/New_York. Tags are provisional unless reviewed. No personal data is persisted.')
 @lru_cache(maxsize=2)
 def cached(bucket): return load_catalog()
 def catalog():

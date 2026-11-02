@@ -2,7 +2,7 @@
 import argparse,json,uuid
 from storage import Supabase
 from tagging import validate,baseline,model_candidate
-from pipeline import now
+from pipeline import now, SOURCES
 
 def main():
     p=argparse.ArgumentParser(); sub=p.add_subparsers(dest='cmd',required=True)
@@ -10,7 +10,7 @@ def main():
     a=sub.add_parser('approve'); a.add_argument('event_id'); a.add_argument('labels_file'); a.add_argument('--reviewer',required=True)
     sub.add_parser('tag-pending')
     args=p.parse_args(); db=Supabase(write=True)
-    events={e['id']:e for e in db.rows('events')}; tags=db.rows('event_tags')
+    events={e['id']:e for e in db.rows('events',source_id='in.('+','.join(SOURCES)+')')}; tags=[t for t in db.rows('event_tags') if t['event_id'] in events]
     if args.cmd=='queue':
         # Gold review deliberately hides model/keyword predictions to reduce anchoring.
         pending=[{'event_id':t['event_id'],'content_hash':events[t['event_id']]['content_hash'],'title':events[t['event_id']]['title'],'description':events[t['event_id']]['description'],'url':events[t['event_id']]['url']} for t in tags if t['review_status']=='pending']

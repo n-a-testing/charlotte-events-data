@@ -13,3 +13,9 @@
 
 - [ ] Unattended refresh: deferred by user. Server secret and signed-in browser needed when resumed; deployment file ready.
 - [ ] Human-reviewed evaluation: no labels or relevance feedback yet.
+
+## Niner Engage scope revision
+- [x] Collect and serve only Niner Engage; preserve historical campus-calendar records
+- [x] Regenerate five plots and three-page note for 638 records
+- [x] Preserve split assignments in an active-source subset
+- [x] Verify and redeploy the source-scoped dashboard/API

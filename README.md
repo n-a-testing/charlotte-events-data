@@ -9,7 +9,7 @@ Fresh Python data/API project, independent of the earlier `campus-app`. Existing
 - Modal deployment: https://modal.com/apps/n-a-testing/main/deployed/charlotte-events-data
 - Private repository: https://github.com/n-a-testing/charlotte-events-data
 
-Snapshot: **1,487 real source occurrences**, 638 Niner Engage + 849 campus-calendar records, collected November 2, 2026. No fabricated events or evaluation scores. Public dashboard/API use a publishable key and read-only RLS. Raw source records, run details, reviewer identities and split assignments are private.
+Active snapshot: **638 Niner Engage occurrences**, collected November 2, 2026. Campus-calendar ingestion is disabled and its 849 previously collected records are excluded from the dashboard, API, review queue and current D2 reports. Historical database rows and the original frozen split remain intact. No fabricated events or evaluation scores. Public dashboard/API use a publishable key and read-only RLS. Raw source records, run details, reviewer identities and split assignments are private.
 
 ## Setup and run
 Python 3.13 was used for verification and Modal deployment.
@@ -36,7 +36,7 @@ The publishable key is intentionally public and grants no write/private-table pr
 
 ```sh
 # In a server-side shell only, configure SUPABASE_SERVICE_ROLE_KEY securely.
-python pipeline.py                     # collect both feeds and publish to Supabase
+python pipeline.py                     # collect Niner Engage and publish to Supabase
 python pipeline.py --replay data/raw/SNAPSHOT_DIRECTORY
 python analysis.py                     # five PNGs, statistics, immutable split manifest
 python review.py queue                 # private blinded review queue
@@ -46,7 +46,7 @@ python review.py tag-pending            # optional configured model; no key mean
 
 For connector-based publication without a local privileged key, `python pipeline.py --export` archives feeds and emits ordered SQL batches under ignored `data/sql/`. Apply `SOURCE-000.sql`, numbered batches, then `SOURCE-999.sql` in order using an authorized server connector. These SQL files contain raw source material and stay out of Git. The tail marks success only after all batches succeed. Do not mark a partially applied batch sequence successful. Replaying identical batches is safe and preserves first-seen timestamps and reviewed unchanged labels.
 
-Original byte feeds and sidecar collection timestamps are under ignored `data/raw/`; item XML versions persist in Supabase. `analysis.py` currently analyzes `data/events.json` from the most recent ingestion/export; the interactive dashboard always reads Supabase directly. Reports describe the original frozen snapshot. To reproduce the PDF, use a Python environment with reportlab and run `python make_note.py`; the already-rendered three-page PDF is committed. Full-snapshot grouping audit skips in a fresh checkout until ingestion has created `data/events.json`; all parser/evidence tests use checked-in source excerpts.
+Original byte feeds and sidecar collection timestamps are under ignored `data/raw/`; item XML versions persist in Supabase. `analysis.py` currently analyzes `data/events.json` from the most recent ingestion/export; the interactive dashboard always reads Supabase directly. Reports describe the Niner Engage subset of the original frozen snapshot. No new collection is claimed by this scope update. To reproduce the PDF, use a Python environment with reportlab and run `python make_note.py`; the already-rendered three-page PDF is committed. Full-snapshot grouping audit skips in a fresh checkout until ingestion has created `data/events.json`; all parser/evidence tests use checked-in source excerpts.
 
 ## Deployment and unattended refresh
 
@@ -77,7 +77,7 @@ Reads cache for up to 120 seconds. Saved IDs can come from a future client adapt
 - [x] Data dictionary: `DATA_DICTIONARY.md`
 - [x] Five plots: `reports/figure-1.png` through `figure-5.png`, interpreted in the note
 - [x] Three-page note: `reports/D2-data-note.pdf`
-- [x] Frozen grouped split: `data/split_manifest.json`, also stored privately in Supabase
+- [x] Frozen grouped split: `data/active_split_manifest.json` (638 records), preserving assignments from the original manifest and Supabase
 - [x] Supabase-backed Streamlit dashboard deployed on Modal
 - [x] API, conservative tagging, review CLI and preference recommendations
 - [x] Repeat-load, update, date/DST, recurrence, unsupported-food and private-access checks
@@ -91,4 +91,7 @@ Reads cache for up to 120 seconds. Saved IDs can come from a future client adapt
 - `analysis.py`, `make_note.py`, reports, dictionary and `EVALUATION.md`: D2 and evaluation design.
 - `tests/`: deterministic source-excerpt tests plus full-snapshot grouping audit.
 
-See `reports/live-verification.json` for actual verification. Replaying all 1,487 records produced no extra events, raw versions or tags. A changed-content upsert was verified inside a rolled-back transaction. Public private-table reads and catalog writes returned HTTP 401. Supabase security advisory reported only four informational RLS-with-no-policy notices, intentional for private tables. Nine foundation tests passed; the untouched earlier app passed syntax checks and all eleven tests. No learned-model quality or recommendation performance is asserted.
+See `reports/live-verification.json` for current Niner Engage verification. Historical initial-load verification: replaying all 1,487 records produced no extra events, raw versions or tags. A changed-content upsert was verified inside a rolled-back transaction. Public private-table reads and catalog writes returned HTTP 401. Supabase security advisory reported only four informational RLS-with-no-policy notices, intentional for private tables. Eleven foundation tests passed; the untouched earlier app passed syntax checks and all eleven tests. No learned-model quality or recommendation performance is asserted.
+
+## Scope revision: Niner Engage only
+`pipeline.SOURCES` is the active-source allowlist used by collection, serving, analysis and review. The legacy parser and database rows are retained only for reproducibility. Current reports contain 638 records, 16 cancellations, 8 explicit free-food positives, 1 free-admission positive and 7 registration requirements. All tags remain provisional. Active frozen partitions contain 558 train / 72 validation / 8 test records. These small, unbalanced subsets are not sufficient to claim model quality; do not rebalance after looking at outcomes.

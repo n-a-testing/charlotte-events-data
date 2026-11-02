@@ -11,8 +11,8 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-SOURCES = {'ninerengage': 'https://ninerengage.charlotte.edu/events.rss',
-           'campusevents': 'https://campusevents.charlotte.edu/calendar.xml'}
+# Only this allowlist is collected and served. Legacy parsing remains for archives.
+SOURCES = {'ninerengage': 'https://ninerengage.charlotte.edu/events.rss'}
 BASE = Path(__file__).parent
 
 def now(): return datetime.now(timezone.utc).isoformat()

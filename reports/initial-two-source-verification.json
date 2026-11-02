@@ -1,0 +1,46 @@
+{
+  "database_events": 1487,
+  "tags": 1487,
+  "private_tables_http_status": {
+    "raw_records": 401,
+    "ingestion_runs": 401,
+    "tag_reviews": 401,
+    "evaluation_splits": 401
+  },
+  "public_write_status": 401,
+  "api": "passed",
+  "streamlit_real_supabase_and_search": "passed",
+  "deployed_api_health": {
+    "status": "ok",
+    "event_count": 1487,
+    "sources": [
+      {
+        "id": "campusevents",
+        "url": "https://campusevents.charlotte.edu/calendar.xml",
+        "name": "campusevents",
+        "timezone": "America/New_York",
+        "last_success_at": "2026-11-02T18:47:01.16302+00:00"
+      },
+      {
+        "id": "ninerengage",
+        "url": "https://ninerengage.charlotte.edu/events.rss",
+        "name": "ninerengage",
+        "timezone": "America/New_York",
+        "last_success_at": "2026-11-02T18:47:00.637791+00:00"
+      }
+    ]
+  },
+  "deployed_events": "passed",
+  "deployed_recommendations": "passed",
+  "deployed_dashboard_http": "200",
+  "deployed_streamlit_health": "200",
+  "replay_counts": {
+    "events": 1487,
+    "raw_records": 1487,
+    "tags": 1487
+  },
+  "database_update_rollback_test": "passed",
+  "foundation_tests": 9,
+  "existing_app_tests": 11,
+  "browser_rendered_dashboard": "Confirmed title, 1487 records, 17 cancellations, filters and event table"
+}

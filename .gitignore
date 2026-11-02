@@ -14,3 +14,5 @@ data/sql/
 data/split-sql/
 data/*.sql
 data/*.jsonl
+
+!data/active_split_manifest.json

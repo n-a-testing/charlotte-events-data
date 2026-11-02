@@ -6,7 +6,7 @@ from recommend import recommend
 from tagging import TOPICS
 st.set_page_config(page_title='Charlotte Event Observatory',page_icon='🟢',layout='wide')
 st.title('Charlotte Event Observatory')
-st.caption('UNC Charlotte public event feeds · D2 data foundation · Campus times: America/New_York')
+st.caption('UNC Charlotte Niner Engage public events · D2 data foundation · Campus times: America/New_York')
 @st.cache_data(ttl=120)
 def fetch(): return load_catalog()
 if st.button('Refresh from Supabase'): fetch.clear()
@@ -17,7 +17,7 @@ if not events: st.info('No ingested records yet.'); st.stop()
 st.caption('Last successful collection: '+' · '.join(s['name']+': '+(pd.Timestamp(s['last_success_at']).tz_convert('America/New_York').strftime('%b %d, %Y %I:%M %p %Z') if s.get('last_success_at') else 'Not yet') for s in sources))
 df=frame(events)
 a,b,c=st.columns(3); a.metric('Source occurrence records',len(df)); b.metric('Cancelled',int((df.status=='cancelled').sum())); c.metric('Records with quality flags',int(df.quality_flags.map(bool).sum()))
-st.info('Counts describe a rolling feed snapshot, not all campus activities. Tags are provisional keyword evidence unless human-approved. Missing information means unknown. Related and syndicated listings can occur in both sources.')
+st.info('Counts describe a rolling feed snapshot, not all campus activities. Tags are provisional keyword evidence unless human-approved. Missing information means unknown. Recurring listings remain separate occurrences; the campus-calendar feed is excluded.')
 with st.sidebar:
     st.header('Browse filters')
     chosen=st.multiselect('Sources',sorted(df.source_id.unique()),default=sorted(df.source_id.unique()))

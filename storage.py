@@ -84,7 +84,7 @@ def export_sql(source,run,rows):
     (folder/f'{source}-999.sql').write_text('begin;\n'+tail+'commit;')
 
 def load_catalog():
-    db=Supabase(); events=db.rows('events'); tags={t['event_id']:t for t in db.rows('event_tags')}
+    db=Supabase(); active='in.('+','.join(SOURCES)+')'; events=db.rows('events',source_id=active); tags={t['event_id']:t for t in db.rows('event_tags')}
     for e in events:
         t=tags.get(e['id']); e['tags']=t if t and t['content_hash']==e['content_hash'] else None
-    return events,db.rows('event_sources')
+    return events,db.rows('event_sources',id=active)
