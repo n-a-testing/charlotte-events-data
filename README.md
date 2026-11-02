@@ -54,7 +54,7 @@ Original byte feeds and sidecar collection timestamps are under ignored `data/ra
 modal deploy modal_app.py --env main
 ```
 
-The public serving app is deployed. **Automatic ingestion is not deployed yet:** a privileged server credential is unavailable through the connector, and desktop computer-control permission was denied. The user authorized setup; this is an access blocker, not a pending approval.
+The public serving app is deployed. **Automatic ingestion is deferred at the user’s request.** The initial attempt also lacked a server credential: the connector does not expose it, native computer-control permission was unavailable, and the in-app Supabase browser required sign-in. The dashboard continues to read the stored snapshot.
 
 Prepared separate deployment `modal_ingest.py` mounts a durable archive Volume and refreshes at 11:00 UTC daily (6 AM EST / 7 AM EDT). To activate it, place `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in a Modal secret named `charlotte-events-ingest`, then:
 
@@ -81,7 +81,7 @@ Reads cache for up to 120 seconds. Saved IDs can come from a future client adapt
 - [x] Supabase-backed Streamlit dashboard deployed on Modal
 - [x] API, conservative tagging, review CLI and preference recommendations
 - [x] Repeat-load, update, date/DST, recurrence, unsupported-food and private-access checks
-- [ ] Configure server secret and verify scheduled refresh
+- [ ] Configure server secret and verify scheduled refresh (deferred by user)
 - [ ] Obtain independent human annotations and measure evaluation results (later phase)
 
 ## Files and verification

@@ -11,5 +11,5 @@
 - [x] Deploy and verify Modal dashboard/API
 - [x] Publish private repository and record actual commit
 
-- [ ] Unattended refresh: server credential inaccessible through connector; computer-control permission unavailable. Deployment file ready.
+- [ ] Unattended refresh: deferred by user. Server secret and signed-in browser needed when resumed; deployment file ready.
 - [ ] Human-reviewed evaluation: no labels or relevance feedback yet.
