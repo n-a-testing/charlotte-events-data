@@ -1,0 +1,64 @@
+{
+  "records": 1487,
+  "sources": {
+    "campusevents": 849,
+    "ninerengage": 638
+  },
+  "status": {
+    "active": 1470,
+    "cancelled": 17
+  },
+  "start_min": "2024-12-18 23:45:00-05:00",
+  "start_max": "2027-05-13 00:00:00-04:00",
+  "missing": {
+    "description": 159,
+    "end_at": 849,
+    "location": 849,
+    "organizers": 850,
+    "source_categories": 463,
+    "series_id": 638
+  },
+  "facts": {
+    "free_food": {
+      "unknown": 1472,
+      "yes": 15
+    },
+    "free_admission": {
+      "unknown": 1482,
+      "yes": 5
+    },
+    "registration_required": {
+      "unknown": 1455,
+      "yes": 32
+    }
+  },
+  "top_categories": {
+    "ThoughtfulLearning": 420,
+    "Social": 165,
+    "Academic Calendar": 142,
+    "Information Session": 117,
+    "Public": 61
+  },
+  "top_organizers": {
+    "University Center for Academic Excellence": 344,
+    "Dimensions of Wellness": 32,
+    "Counseling and Psychological Services": 20,
+    "Center for Wellness Promotion": 17,
+    "Niner Chess Club": 16
+  },
+  "duplicate_key_excess": 3,
+  "weekday": {
+    "Tuesday": 363,
+    "Monday": 339,
+    "Thursday": 274,
+    "Wednesday": 254,
+    "Friday": 167,
+    "Saturday": 57,
+    "Sunday": 33
+  },
+  "splits": {
+    "train": 1102,
+    "validation": 206,
+    "test": 179
+  }
+}

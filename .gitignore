@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/raw/
+data/*.json
+!data/split_manifest.json
+.DS_Store
+
+data/sql/
+data/split-sql/
+data/*.sql
+data/*.jsonl
