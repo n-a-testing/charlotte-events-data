@@ -1,5 +1,5 @@
 # Implementation checklist
-- [x] Inspect workspace and verify accounts and both official feeds
+- [x] Verify the official Niner Engage feed and project services
 - [x] Preserve original downloads with collection timestamps
 - [x] Implement repeatable ingestion, normalization, provenance and RLS
 - [x] Load and verify real Supabase records
@@ -7,15 +7,9 @@
 - [x] Reserve grouped holdout before tuning
 - [x] Implement dashboard, API, controlled tagging and review
 - [x] Implement preference-based recommendations and evaluation plan
-- [x] Verify important behavior and existing app checks
+- [x] Verify ingestion, updates, dates, tagging evidence and access policies
 - [x] Deploy and verify Modal dashboard/API
-- [x] Publish private repository and record actual commit
+- [x] Publish the project repository
 
-- [ ] Unattended refresh: deferred by user. Server secret and signed-in browser needed when resumed; deployment file ready.
+- [ ] Configure the server-side secret, deploy scheduled ingestion and verify automatic refresh.
 - [ ] Human-reviewed evaluation: no labels or relevance feedback yet.
-
-## Niner Engage scope revision
-- [x] Collect and serve only Niner Engage; preserve historical campus-calendar records
-- [x] Regenerate five plots and three-page note for 638 records
-- [x] Preserve split assignments in an active-source subset
-- [x] Verify and redeploy the source-scoped dashboard/API

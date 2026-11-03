@@ -1,6 +1,8 @@
 # Charlotte Events Data Foundation
 
-Fresh Python data/API project, independent of the earlier `campus-app`. Existing browser-local saved events and preferences were left untouched.
+A data-science project that develops a recommendation model to help UNC Charlotte students discover campus events matching their interests. It uses public Niner Engage event data to build a reproducible foundation for data collection, cleaning, exploratory analysis, event tagging, and personalized recommendations.
+
+The current recommendation baseline matches student interests and saved-event topics, with variety across categories and organizers. It uses rule-based scoring; a trained machine-learning model and measured recommendation quality are future work. Supabase stores the data, a Streamlit dashboard supports exploration, and an API serves events and recommendations.
 
 ## Live services
 - Dashboard: https://n-a-testing--charlotte-events-data-dashboard.us-east.modal.run
@@ -9,7 +11,7 @@ Fresh Python data/API project, independent of the earlier `campus-app`. Existing
 - Modal deployment: https://modal.com/apps/n-a-testing/main/deployed/charlotte-events-data
 - Private repository: https://github.com/n-a-testing/charlotte-events-data
 
-Active snapshot: **638 Niner Engage occurrences**, collected November 2, 2026. Campus-calendar ingestion is disabled and its 849 previously collected records are excluded from the dashboard, API, review queue and current D2 reports. Historical database rows and the original frozen split remain intact. No fabricated events or evaluation scores. Public dashboard/API use a publishable key and read-only RLS. Raw source records, run details, reviewer identities and split assignments are private.
+Active snapshot: **638 Niner Engage occurrences**, collected November 2, 2026. Source: [Niner Engage RSS feed](https://ninerengage.charlotte.edu/events.rss). Public dashboard/API use a publishable key and read-only RLS. Raw source records, run details, reviewer identities and split assignments are private.
 
 ## Setup and run
 Python 3.13 was used for verification and Modal deployment.
@@ -46,7 +48,7 @@ python review.py tag-pending            # optional configured model; no key mean
 
 For connector-based publication without a local privileged key, `python pipeline.py --export` archives feeds and emits ordered SQL batches under ignored `data/sql/`. Apply `SOURCE-000.sql`, numbered batches, then `SOURCE-999.sql` in order using an authorized server connector. These SQL files contain raw source material and stay out of Git. The tail marks success only after all batches succeed. Do not mark a partially applied batch sequence successful. Replaying identical batches is safe and preserves first-seen timestamps and reviewed unchanged labels.
 
-Original byte feeds and sidecar collection timestamps are under ignored `data/raw/`; item XML versions persist in Supabase. `analysis.py` currently analyzes `data/events.json` from the most recent ingestion/export; the interactive dashboard always reads Supabase directly. Reports describe the Niner Engage subset of the original frozen snapshot. No new collection is claimed by this scope update. To reproduce the PDF, use a Python environment with reportlab and run `python make_note.py`; the already-rendered three-page PDF is committed. Full-snapshot grouping audit skips in a fresh checkout until ingestion has created `data/events.json`; all parser/evidence tests use checked-in source excerpts.
+Original byte feeds and sidecar collection timestamps are under ignored `data/raw/`; item XML versions persist in Supabase. `analysis.py` currently analyzes `data/events.json` from the most recent ingestion/export; the interactive dashboard always reads Supabase directly. Reports describe the November 2, 2026 Niner Engage snapshot. To reproduce the PDF, use a Python environment with reportlab and run `python make_note.py`; the already-rendered three-page PDF is committed. Full-snapshot grouping audit skips in a fresh checkout until ingestion has created `data/events.json`; all parser/evidence tests use checked-in source excerpts.
 
 ## Deployment and unattended refresh
 
@@ -54,7 +56,7 @@ Original byte feeds and sidecar collection timestamps are under ignored `data/ra
 modal deploy modal_app.py --env main
 ```
 
-The public serving app is deployed. **Automatic ingestion is deferred at the user’s request.** The initial attempt also lacked a server credential: the connector does not expose it, native computer-control permission was unavailable, and the in-app Supabase browser required sign-in. The dashboard continues to read the stored snapshot.
+The public serving app is deployed. Automatic ingestion is not enabled; the dashboard reads the stored snapshot. Scheduled refresh requires a server-side credential and deployment of the ingestion app.
 
 Prepared separate deployment `modal_ingest.py` mounts a durable archive Volume and refreshes at 11:00 UTC daily (6 AM EST / 7 AM EDT). To activate it, place `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in a Modal secret named `charlotte-events-ingest`, then:
 
@@ -63,14 +65,14 @@ modal deploy modal_ingest.py --env main
 modal run modal_ingest.py::refresh --env main
 ```
 
-Verify a successful ingestion run and new last-refresh timestamp before calling the schedule operational. The serving functions never receive this secret. Daily refresh can consume Modal credits. No LLM provider key was available, so all current labels are keyword candidates pending review; optional OpenAI-compatible extraction uses TAG_MODEL_URL, TAG_MODEL_NAME and TAG_MODEL_API_KEY in the ingestion/review environment only.
+Verify a successful ingestion run and new last-refresh timestamp before calling the schedule operational. The serving functions never receive this secret. Daily refresh can consume Modal credits. Current labels are keyword candidates pending human review; optional OpenAI-compatible extraction uses TAG_MODEL_URL, TAG_MODEL_NAME and TAG_MODEL_API_KEY in the ingestion/review environment only.
 
 ## API
 - `GET /health`: database connectivity, event count and source refresh timestamps.
 - `GET /events?source=ninerengage&q=chess&upcoming=true&offset=0&limit=50`: search and pagination (max 200); start dates are UTC ISO strings, campus display America/New_York.
 - `POST /recommendations`: JSON interests, saved_ids, audience, free_food, free_admission, limit. No preference persistence. See OpenAPI for schema.
 
-Reads cache for up to 120 seconds. Saved IDs can come from a future client adapter; existing localStorage is neither read nor altered by this new foundation. Factual filters require explicit yes; unknown is never a negative label. A read-only dashboard can show unreviewed tags with their provisional status; do not treat these as gold labels.
+Reads cache for up to 120 seconds. Clients can supply saved-event IDs with each recommendation request. Factual filters require explicit yes; unknown is never a negative label. A read-only dashboard can show unreviewed tags with their provisional status; do not treat these as gold labels.
 
 ## D2 submission checklist
 - [x] Real clean event records in Supabase, raw provenance and collection timestamps
@@ -81,7 +83,7 @@ Reads cache for up to 120 seconds. Saved IDs can come from a future client adapt
 - [x] Supabase-backed Streamlit dashboard deployed on Modal
 - [x] API, conservative tagging, review CLI and preference recommendations
 - [x] Repeat-load, update, date/DST, recurrence, unsupported-food and private-access checks
-- [ ] Configure server secret and verify scheduled refresh (deferred by user)
+- [ ] Configure server secret and verify scheduled refresh
 - [ ] Obtain independent human annotations and measure evaluation results (later phase)
 
 ## Files and verification
@@ -91,7 +93,4 @@ Reads cache for up to 120 seconds. Saved IDs can come from a future client adapt
 - `analysis.py`, `make_note.py`, reports, dictionary and `EVALUATION.md`: D2 and evaluation design.
 - `tests/`: deterministic source-excerpt tests plus full-snapshot grouping audit.
 
-See `reports/live-verification.json` for current Niner Engage verification. Historical initial-load verification: replaying all 1,487 records produced no extra events, raw versions or tags. A changed-content upsert was verified inside a rolled-back transaction. Public private-table reads and catalog writes returned HTTP 401. Supabase security advisory reported only four informational RLS-with-no-policy notices, intentional for private tables. Eleven foundation tests passed; the untouched earlier app passed syntax checks and all eleven tests. No learned-model quality or recommendation performance is asserted.
-
-## Scope revision: Niner Engage only
-`pipeline.SOURCES` is the active-source allowlist used by collection, serving, analysis and review. The legacy parser and database rows are retained only for reproducibility. Current reports contain 638 records, 16 cancellations, 8 explicit free-food positives, 1 free-admission positive and 7 registration requirements. All tags remain provisional. Active frozen partitions contain 558 train / 72 validation / 8 test records. These small, unbalanced subsets are not sufficient to claim model quality; do not rebalance after looking at outcomes.
+See `reports/live-verification.json` for current Niner Engage verification. Historical initial-load verification: replaying all 1,487 records produced no extra events, raw versions or tags. A changed-content upsert was verified inside a rolled-back transaction. Public private-table reads and catalog writes returned HTTP 401. Supabase security advisory reported only four informational RLS-with-no-policy notices, intentional for private tables. Eleven foundation tests passed. No learned-model quality or recommendation performance is asserted.
